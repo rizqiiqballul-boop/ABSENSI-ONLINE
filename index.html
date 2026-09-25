@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Absensi Online</title>
@@ -183,5 +184,60 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&l
 function msg(x){return `<div class="card">${esc(x)}</div>`}
 db.auth.getSession().then(({data:{session}})=>{if(session)start(session.user)});
 </script>
+ <!-- ADMIN LOGIN -->
+<div id="adminPanel" style="display:none;">
+  <h2>👑 Admin Absensi</h2>
+
+  <input id="adminEmail" type="email" placeholder="Email Admin">
+  <input id="adminPassword" type="password" placeholder="Password Admin">
+
+  <button onclick="loginAdmin()">Login Admin</button>
+
+  <div id="adminDashboard" style="display:none;">
+    <h3>Dashboard Admin</h3>
+    <button onclick="buatQR()">🔳 Buat QR Absensi</button>
+    <div id="qrAdmin" style="margin-top:20px;"></div>
+  </div>
+</div>
+
+<script>
+async function async function loginAdmin() {
+  const email = document.getElementById("adminEmail").value;
+  const password = document.getElementById("adminPassword").value;
+
+  const { data, error } = await db.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    alert("Login admin gagal: " + error.message);
+    return;
+  }
+
+  document.getElementById("adminDashboard").style.display = "block";
+  alert("Login admin berhasil!");
+}
+}
+
+function buatQR() {
+  const kode = "ABSEN-" + Date.now();
+
+  document.getElementById("qrAdmin").innerHTML = `
+    <h3>Scan QR Ini</h3>
+    <div id="qrCode"></div>
+    <p>Kode sesi: ${kode}</p>
+  `;
+
+  new QRCode(document.getElementById("qrCode"), {
+    text: kode,
+    width: 250,
+    height: 250
+  });
+}
+</script> 
 </body>
+  <button type="button" onclick="document.getElementById('adminPanel').style.display='block'">
+  👑 Login Admin
+</button>
 </html>
